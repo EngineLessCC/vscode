@@ -1,6 +1,6 @@
 {
-	"nameShort": "Code - VCCS",
-	"nameLong": "Code - VCCS",
+	"nameShort": "CodeVCCS",
+	"nameLong": "CodeVCCS",
 	"applicationName": "code-vccs",
 	"dataFolderName": ".vscode-vccs",
 	"win32MutexName": "vscodevccs",
@@ -21,7 +21,7 @@
 	"win32x64UserAppId": "{{VCCS787D-37A0-49E8-AE24-8559A032BE0C}",
 	"win32arm64UserAppId": "{{VCCSF0C8-F733-4AD4-BADE-FDB816D53D7B}",
 	"win32AppUserModelId": "Microsoft.CodeVCCS",
-	"win32ShellNameShort": "C&ode - VCCS",
+	"win32ShellNameShort": "C&odeVCCS",
 	"darwinBundleIdentifier": "com.visualstudio.code.vccs",
 	"linuxIconName": "com.visualstudio.code.vccs",
 	"licenseFileName": "LICENSE.txt",
