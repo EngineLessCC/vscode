@@ -46,7 +46,7 @@ import { IStorageService, StorageScope, StorageTarget } from 'vs/platform/storag
 import { ITelemetryService } from 'vs/platform/telemetry/common/telemetry';
 import { ITerminalCommand, TerminalCapability } from 'vs/platform/terminal/common/capabilities/capabilities';
 import { TerminalCapabilityStoreMultiplexer } from 'vs/platform/terminal/common/capabilities/terminalCapabilityStore';
-import { IProcessDataEvent, IProcessPropertyMap, IShellLaunchConfig, ITerminalDimensionsOverride, ITerminalLaunchError, ProcessPropertyType, TerminalIcon, TerminalLocation, TerminalSettingId, TerminalShellType, TitleEventSource, WindowsShellType } from 'vs/platform/terminal/common/terminal';
+import { IProcessDataEvent, IProcessPropertyMap, IShellLaunchConfig, ITerminalDimensionsOverride, ITerminalLaunchError, PosixShellType, ProcessPropertyType, TerminalIcon, TerminalLocation, TerminalSettingId, TerminalShellType, TitleEventSource, WindowsShellType } from 'vs/platform/terminal/common/terminal';
 import { escapeNonWindowsPath } from 'vs/platform/terminal/common/terminalEnvironment';
 import { activeContrastBorder, scrollbarSliderActiveBackground, scrollbarSliderBackground, scrollbarSliderHoverBackground } from 'vs/platform/theme/common/colorRegistry';
 import { IColorTheme, ICssStyleCollector, IThemeService, registerThemingParticipant, ThemeIcon } from 'vs/platform/theme/common/themeService';
@@ -71,7 +71,7 @@ import { NavigationModeAddon } from 'vs/workbench/contrib/terminal/browser/xterm
 import { XtermTerminal } from 'vs/workbench/contrib/terminal/browser/xterm/xtermTerminal';
 import { IEnvironmentVariableCollection, IEnvironmentVariableInfo } from 'vs/workbench/contrib/terminal/common/environmentVariable';
 import { deserializeEnvironmentVariableCollections } from 'vs/workbench/contrib/terminal/common/environmentVariableShared';
-import { getCommandHistory, getDirectoryHistory } from 'vs/workbench/contrib/terminal/common/history';
+import { getCommandHistory, getDirectoryHistory, getShellFileHistory } from 'vs/workbench/contrib/terminal/common/history';
 import { DEFAULT_COMMANDS_TO_SKIP_SHELL, INavigationMode, ITerminalBackend, ITerminalProcessManager, ITerminalProfileResolverService, ProcessState, TerminalCommandId, TERMINAL_CREATION_COMMANDS, TERMINAL_VIEW_ID } from 'vs/workbench/contrib/terminal/common/terminal';
 import { TerminalContextKeys } from 'vs/workbench/contrib/terminal/common/terminalContextKey';
 import { formatMessageForTerminal } from 'vs/platform/terminal/common/terminalStrings';
@@ -82,8 +82,9 @@ import { IHistoryService } from 'vs/workbench/services/history/common/history';
 import { IWorkbenchLayoutService, Position } from 'vs/workbench/services/layout/browser/layoutService';
 import { IPathService } from 'vs/workbench/services/path/common/pathService';
 import { IPreferencesService } from 'vs/workbench/services/preferences/common/preferences';
-import type { ITerminalAddon, Terminal as XTermTerminal } from 'xterm';
+import type { IMarker, ITerminalAddon, Terminal as XTermTerminal } from 'xterm';
 import { IOpenerService } from 'vs/platform/opener/common/opener';
+import { IGenericMarkProperties } from 'vs/platform/terminal/common/terminalProcess';
 
 const enum Constants {
 	/**
@@ -123,6 +124,8 @@ interface IGridDimensions {
 	cols: number;
 	rows: number;
 }
+
+const shellIntegrationSupportedShellTypes = [PosixShellType.Bash, PosixShellType.Zsh, PosixShellType.PowerShell, WindowsShellType.PowerShell];
 
 const scrollbarHeight = 5;
 
@@ -228,7 +231,7 @@ export class TerminalInstance extends Disposable implements ITerminalInstance {
 	}
 	get disableShellIntegrationReporting(): boolean {
 		if (this._disableShellIntegrationReporting === undefined) {
-			this._disableShellIntegrationReporting = this.shellLaunchConfig.isFeatureTerminal || this.shellLaunchConfig.hideFromUser || this.shellLaunchConfig.executable === undefined;
+			this._disableShellIntegrationReporting = (this.shellLaunchConfig.hideFromUser || this.shellLaunchConfig.executable === undefined || this.shellType === undefined) || !shellIntegrationSupportedShellTypes.includes(this.shellType);
 		}
 		return this._disableShellIntegrationReporting;
 	}
@@ -891,12 +894,29 @@ export class TerminalInstance extends Disposable implements ITerminalInstance {
 						label,
 						buttons: [removeFromCommandHistoryButton]
 					});
+					commandMap.add(label);
 				}
 			}
+
 			if (previousSessionItems.length > 0) {
 				items.push(
 					{ type: 'separator', label: terminalStrings.previousSessionCategory },
 					...previousSessionItems
+				);
+			}
+
+			// Gather shell file history
+			const shellFileHistory = await this._instantiationService.invokeFunction(getShellFileHistory, this._shellType);
+			const dedupedShellFileItems: IQuickPickItem[] = [];
+			for (const label of shellFileHistory) {
+				if (!commandMap.has(label)) {
+					dedupedShellFileItems.unshift({ label });
+				}
+			}
+			if (dedupedShellFileItems.length > 0) {
+				items.push(
+					{ type: 'separator', label: nls.localize('shellFileHistoryCategory', '{0} history', this._shellType) },
+					...dedupedShellFileItems
 				);
 			}
 		} else {
@@ -937,6 +957,7 @@ export class TerminalInstance extends Disposable implements ITerminalInstance {
 		const outputProvider = this._instantiationService.createInstance(TerminalOutputProvider);
 		const quickPick = this._quickInputService.createQuickPick();
 		quickPick.items = items;
+		quickPick.sortByLabel = false;
 		quickPick.placeholder = placeholder;
 		return new Promise<void>(r => {
 			quickPick.onDidTriggerItemButton(async e => {
@@ -1592,6 +1613,14 @@ export class TerminalInstance extends Disposable implements ITerminalInstance {
 			this._icon = this._shellLaunchConfig.attachPersistentProcess?.icon || this._shellLaunchConfig.icon;
 			this._onIconChanged.fire(this);
 		}
+	}
+
+	public registerMarker(): IMarker | undefined {
+		return this.xterm?.raw.registerMarker();
+	}
+
+	public addGenericMark(marker: IMarker, genericMarkProperties: IGenericMarkProperties): void {
+		this.xterm?.addDecoration(marker, genericMarkProperties);
 	}
 
 	private _onProcessData(ev: IProcessDataEvent): void {
