@@ -4319,10 +4319,10 @@ electron-to-chromium@^1.4.17:
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.45.tgz#cf1144091d6683cbd45a231954a745f02fb24598"
   integrity sha512-czF9eYVuOmlY/vxyMQz2rGlNSjZpxNQYBe1gmQv7al171qOIhgyO9k7D5AKlgeTCSPKk+LHhj5ZyIdmEub9oNg==
 
-electron@20.0.0-beta.1:
-  version "20.0.0-beta.1"
-  resolved "https://registry.yarnpkg.com/electron/-/electron-20.0.0-beta.1.tgz#6a803a263f700a7d430b8773610be4eff994e06b"
-  integrity sha512-qLd9fAEO/XvWsAFUM553/Pco4FwPsZiOGqI6rjErSkk3Ecf1MzHv7gVj88ONF2qCx30K0oG22hQlqOtvJkOGMQ==
+electron@20.0.0-beta.4:
+  version "20.0.0-beta.4"
+  resolved "https://registry.yarnpkg.com/electron/-/electron-20.0.0-beta.4.tgz#fcdfe96a01cff67931d7d378a287d1409af0596b"
+  integrity sha512-9h2bCib8lqIKk1EY7kBDRbIfwpk17WrJLSv57odXdDHe1vaOrsk6Nbk/nocsjls+B2Xf3AQjnXzuzLAdOMWsMw==
   dependencies:
     "@electron/get" "^1.14.1"
     "@types/node" "^16.11.26"
@@ -12242,7 +12242,6 @@ xterm-addon-search@0.9.0:
   version "0.9.0"
   resolved "https://registry.yarnpkg.com/xterm-addon-search/-/xterm-addon-search-0.9.0.tgz#95278ebb818cfcf882209ae75be96e0bea5d52a5"
   integrity sha512-aoolI8YuHvdGw+Qjg8g2M4kst0v86GtB7WeBm4F0jNXA005/6QbWWy9eCsvnIDLJOFI5JSSrZnD6CaOkvBQYPA==
-
 
 xterm-addon-serialize@0.7.0:
   version "0.7.0"
