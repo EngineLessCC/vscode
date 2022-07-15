@@ -9,7 +9,7 @@ import { List } from 'vs/base/browser/ui/list/listWidget';
 import { KeybindingsRegistry, KeybindingWeight } from 'vs/platform/keybinding/common/keybindingsRegistry';
 import { IListService } from 'vs/platform/list/browser/listService';
 import { IDebugService, IEnablement, CONTEXT_BREAKPOINTS_FOCUSED, CONTEXT_WATCH_EXPRESSIONS_FOCUSED, CONTEXT_VARIABLES_FOCUSED, EDITOR_CONTRIBUTION_ID, IDebugEditorContribution, CONTEXT_IN_DEBUG_MODE, CONTEXT_EXPRESSION_SELECTED, IConfig, IStackFrame, IThread, IDebugSession, CONTEXT_DEBUG_STATE, IDebugConfiguration, CONTEXT_JUMP_TO_CURSOR_SUPPORTED, REPL_VIEW_ID, CONTEXT_DEBUGGERS_AVAILABLE, State, getStateLabel, CONTEXT_BREAKPOINT_INPUT_FOCUSED, CONTEXT_FOCUSED_SESSION_IS_ATTACH, VIEWLET_ID, CONTEXT_DISASSEMBLY_VIEW_FOCUS, CONTEXT_IN_DEBUG_REPL, CONTEXT_STEP_INTO_TARGETS_SUPPORTED } from 'vs/workbench/contrib/debug/common/debug';
-import { Expression, Variable, Breakpoint, FunctionBreakpoint, DataBreakpoint } from 'vs/workbench/contrib/debug/common/debugModel';
+import { Expression, Variable, Breakpoint, FunctionBreakpoint, DataBreakpoint, Thread } from 'vs/workbench/contrib/debug/common/debugModel';
 import { IExtensionsViewPaneContainer, VIEWLET_ID as EXTENSIONS_VIEWLET_ID } from 'vs/workbench/contrib/extensions/common/extensions';
 import { ICodeEditor, isCodeEditor } from 'vs/editor/browser/editorBrowser';
 import { MenuRegistry, MenuId } from 'vs/platform/actions/common/actions';
@@ -64,6 +64,10 @@ export const REMOVE_EXPRESSION_COMMAND_ID = 'debug.removeWatchExpression';
 export const NEXT_DEBUG_CONSOLE_ID = 'workbench.action.debug.nextConsole';
 export const PREV_DEBUG_CONSOLE_ID = 'workbench.action.debug.prevConsole';
 export const SHOW_LOADED_SCRIPTS_ID = 'workbench.action.debug.showLoadedScripts';
+export const CALLSTACK_TOP_ID = 'workbench.action.debug.callStackTop';
+export const CALLSTACK_BOTTOM_ID = 'workbench.action.debug.callStackBottom';
+export const CALLSTACK_UP_ID = 'workbench.action.debug.callStackUp';
+export const CALLSTACK_DOWN_ID = 'workbench.action.debug.callStackDown';
 
 export const DEBUG_COMMAND_CATEGORY = 'Debug';
 export const RESTART_LABEL = { value: nls.localize('restartDebug', "Restart"), original: 'Restart' };
@@ -84,6 +88,10 @@ export const DEBUG_RUN_LABEL = { value: nls.localize('startWithoutDebugging', "S
 export const NEXT_DEBUG_CONSOLE_LABEL = { value: nls.localize('nextDebugConsole', "Focus Next Debug Console"), original: 'Focus Next Debug Console' };
 export const PREV_DEBUG_CONSOLE_LABEL = { value: nls.localize('prevDebugConsole', "Focus Previous Debug Console"), original: 'Focus Previous Debug Console' };
 export const OPEN_LOADED_SCRIPTS_LABEL = { value: nls.localize('openLoadedScript', "Open Loaded Script..."), original: 'Open Loaded Script...' };
+export const CALLSTACK_TOP_LABEL = { value: nls.localize('callStackTop', "Navigate to Top of Call Stack"), original: 'Navigate to Top of Call Stack' };
+export const CALLSTACK_BOTTOM_LABEL = { value: nls.localize('callStackBottom', "Navigate to Bottom of Call Stack"), original: 'Navigate to Bottom of Call Stack' };
+export const CALLSTACK_UP_LABEL = { value: nls.localize('callStackUp', "Navigate Up Call Stack"), original: 'Navigate Up Call Stack' };
+export const CALLSTACK_DOWN_LABEL = { value: nls.localize('callStackDown', "Navigate Down Call Stack"), original: 'Navigate Down Call Stack' };
 
 export const SELECT_DEBUG_CONSOLE_LABEL = { value: nls.localize('selectDebugConsole', "Select Debug Console"), original: 'Select Debug Console' };
 
@@ -180,6 +188,103 @@ async function changeDebugConsoleFocus(accessor: ServicesAccessor, next: boolean
 	}
 }
 
+async function navigateCallStack(debugService: IDebugService, down: boolean) {
+	const frame = debugService.getViewModel().focusedStackFrame;
+	if (frame) {
+
+		let callStack = frame.thread.getCallStack();
+		let index = callStack.findIndex(elem => elem.frameId === frame.frameId);
+		let nextVisibleFrame;
+		if (down) {
+			if (index >= callStack.length - 1) {
+				if ((<Thread>frame.thread).reachedEndOfCallStack) {
+					goToTopOfCallStack(debugService);
+					return;
+				} else {
+					await debugService.getModel().fetchCallstack(frame.thread, 20);
+					callStack = frame.thread.getCallStack();
+					index = callStack.findIndex(elem => elem.frameId === frame.frameId);
+				}
+			}
+			nextVisibleFrame = findNextVisibleFrame(true, callStack, index);
+		} else {
+			if (index <= 0) {
+				goToBottomOfCallStack(debugService);
+				return;
+			}
+			nextVisibleFrame = findNextVisibleFrame(false, callStack, index);
+		}
+
+		if (nextVisibleFrame) {
+			debugService.focusStackFrame(nextVisibleFrame);
+		}
+	}
+}
+
+async function goToBottomOfCallStack(debugService: IDebugService) {
+	const thread = debugService.getViewModel().focusedThread;
+	if (thread) {
+		await debugService.getModel().fetchCallstack(thread);
+		const callStack = thread.getCallStack();
+		if (callStack.length > 0) {
+			const nextVisibleFrame = findNextVisibleFrame(false, callStack, 0); // must consider the next frame up first, which will be the last frame
+			if (nextVisibleFrame) {
+				debugService.focusStackFrame(nextVisibleFrame);
+			}
+		}
+	}
+}
+
+function goToTopOfCallStack(debugService: IDebugService) {
+	const thread = debugService.getViewModel().focusedThread;
+
+	if (thread) {
+		debugService.focusStackFrame(thread.getTopStackFrame());
+	}
+}
+
+/**
+ * Finds next frame that is not skipped by SkipFiles. Skips frame at index and starts searching at next.
+ * Must satisfy `0 <= startIndex <= callStack - 1`
+ * @param down specifies whether to search downwards if the current file is skipped.
+ * @param callStack the call stack to search
+ * @param startIndex the index to start the search at
+ */
+function findNextVisibleFrame(down: boolean, callStack: readonly IStackFrame[], startIndex: number) {
+
+	if (startIndex >= callStack.length) {
+		startIndex = callStack.length - 1;
+	} else if (startIndex < 0) {
+		startIndex = 0;
+	}
+
+	let index = startIndex;
+
+	let currFrame;
+	do {
+		if (down) {
+			if (index === callStack.length - 1) {
+				index = 0;
+			} else {
+				index++;
+			}
+		} else {
+			if (index === 0) {
+				index = callStack.length - 1;
+			} else {
+				index--;
+			}
+		}
+
+		currFrame = callStack[index];
+		if (!(currFrame.source.presentationHint === 'deemphasize' || currFrame.presentationHint === 'deemphasize')) {
+			return currFrame;
+		}
+	} while (index !== startIndex); // end loop when we've just checked the start index, since that should be the last one checked
+
+	return undefined;
+}
+
 // These commands are used in call stack context menu, call stack inline actions, command palette, debug toolbar, mac native touch bar
 // When the command is exectued in the context of a thread(context menu on a thread, inline call stack action) we pass the thread id
 // Otherwise when it is executed "globaly"(using the touch bar, debug toolbar, command palette) we do not pass any id and just take whatever is the focussed thread
@@ -199,27 +304,27 @@ CommandsRegistry.registerCommand({
 
 CommandsRegistry.registerCommand({
 	id: REVERSE_CONTINUE_ID,
-	handler: (accessor: ServicesAccessor, _: string, context: CallStackContext | unknown) => {
-		getThreadAndRun(accessor, context, thread => thread.reverseContinue());
+	handler: async (accessor: ServicesAccessor, _: string, context: CallStackContext | unknown) => {
+		await getThreadAndRun(accessor, context, thread => thread.reverseContinue());
 	}
 });
 
 CommandsRegistry.registerCommand({
 	id: STEP_BACK_ID,
-	handler: (accessor: ServicesAccessor, _: string, context: CallStackContext | unknown) => {
+	handler: async (accessor: ServicesAccessor, _: string, context: CallStackContext | unknown) => {
 		const contextKeyService = accessor.get(IContextKeyService);
 		if (CONTEXT_DISASSEMBLY_VIEW_FOCUS.getValue(contextKeyService)) {
-			getThreadAndRun(accessor, context, (thread: IThread) => thread.stepBack('instruction'));
+			await getThreadAndRun(accessor, context, (thread: IThread) => thread.stepBack('instruction'));
 		} else {
-			getThreadAndRun(accessor, context, (thread: IThread) => thread.stepBack());
+			await getThreadAndRun(accessor, context, (thread: IThread) => thread.stepBack());
 		}
 	}
 });
 
 CommandsRegistry.registerCommand({
 	id: TERMINATE_THREAD_ID,
-	handler: (accessor: ServicesAccessor, _: string, context: CallStackContext | unknown) => {
-		getThreadAndRun(accessor, context, thread => thread.terminate());
+	handler: async (accessor: ServicesAccessor, _: string, context: CallStackContext | unknown) => {
+		await getThreadAndRun(accessor, context, thread => thread.terminate());
 	}
 });
 
@@ -258,6 +363,39 @@ CommandsRegistry.registerCommand({
 		}
 
 		return notificationService.warn(nls.localize('noExecutableCode', "No executable code is associated at the current cursor position."));
+	}
+});
+
+
+CommandsRegistry.registerCommand({
+	id: CALLSTACK_TOP_ID,
+	handler: async (accessor: ServicesAccessor, _: string, context: CallStackContext | unknown) => {
+		const debugService = accessor.get(IDebugService);
+		goToTopOfCallStack(debugService);
+	}
+});
+
+CommandsRegistry.registerCommand({
+	id: CALLSTACK_BOTTOM_ID,
+	handler: async (accessor: ServicesAccessor, _: string, context: CallStackContext | unknown) => {
+		const debugService = accessor.get(IDebugService);
+		await goToBottomOfCallStack(debugService);
+	}
+});
+
+CommandsRegistry.registerCommand({
+	id: CALLSTACK_UP_ID,
+	handler: async (accessor: ServicesAccessor, _: string, context: CallStackContext | unknown) => {
+		const debugService = accessor.get(IDebugService);
+		navigateCallStack(debugService, false);
+	}
+});
+
+CommandsRegistry.registerCommand({
+	id: CALLSTACK_DOWN_ID,
+	handler: async (accessor: ServicesAccessor, _: string, context: CallStackContext | unknown) => {
+		const debugService = accessor.get(IDebugService);
+		navigateCallStack(debugService, true);
 	}
 });
 
@@ -329,12 +467,12 @@ KeybindingsRegistry.registerCommandAndKeybindingRule({
 	weight: KeybindingWeight.WorkbenchContrib,
 	primary: isWeb ? (KeyMod.Alt | KeyCode.F10) : KeyCode.F10, // Browsers do not allow F10 to be binded so we have to bind an alternative
 	when: CONTEXT_DEBUG_STATE.isEqualTo('stopped'),
-	handler: (accessor: ServicesAccessor, _: string, context: CallStackContext | unknown) => {
+	handler: async (accessor: ServicesAccessor, _: string, context: CallStackContext | unknown) => {
 		const contextKeyService = accessor.get(IContextKeyService);
 		if (CONTEXT_DISASSEMBLY_VIEW_FOCUS.getValue(contextKeyService)) {
-			getThreadAndRun(accessor, context, (thread: IThread) => thread.next('instruction'));
+			await getThreadAndRun(accessor, context, (thread: IThread) => thread.next('instruction'));
 		} else {
-			getThreadAndRun(accessor, context, (thread: IThread) => thread.next());
+			await getThreadAndRun(accessor, context, (thread: IThread) => thread.next());
 		}
 	}
 });
@@ -348,12 +486,12 @@ KeybindingsRegistry.registerCommandAndKeybindingRule({
 	primary: STEP_INTO_KEYBINDING,
 	// Use a more flexible when clause to not allow full screen command to take over when F11 pressed a lot of times
 	when: CONTEXT_DEBUG_STATE.notEqualsTo('inactive'),
-	handler: (accessor: ServicesAccessor, _: string, context: CallStackContext | unknown) => {
+	handler: async (accessor: ServicesAccessor, _: string, context: CallStackContext | unknown) => {
 		const contextKeyService = accessor.get(IContextKeyService);
 		if (CONTEXT_DISASSEMBLY_VIEW_FOCUS.getValue(contextKeyService)) {
-			getThreadAndRun(accessor, context, (thread: IThread) => thread.stepIn('instruction'));
+			await getThreadAndRun(accessor, context, (thread: IThread) => thread.stepIn('instruction'));
 		} else {
-			getThreadAndRun(accessor, context, (thread: IThread) => thread.stepIn());
+			await getThreadAndRun(accessor, context, (thread: IThread) => thread.stepIn());
 		}
 	}
 });
@@ -363,12 +501,12 @@ KeybindingsRegistry.registerCommandAndKeybindingRule({
 	weight: KeybindingWeight.WorkbenchContrib,
 	primary: KeyMod.Shift | KeyCode.F11,
 	when: CONTEXT_DEBUG_STATE.isEqualTo('stopped'),
-	handler: (accessor: ServicesAccessor, _: string, context: CallStackContext | unknown) => {
+	handler: async (accessor: ServicesAccessor, _: string, context: CallStackContext | unknown) => {
 		const contextKeyService = accessor.get(IContextKeyService);
 		if (CONTEXT_DISASSEMBLY_VIEW_FOCUS.getValue(contextKeyService)) {
-			getThreadAndRun(accessor, context, (thread: IThread) => thread.stepOut('instruction'));
+			await getThreadAndRun(accessor, context, (thread: IThread) => thread.stepOut('instruction'));
 		} else {
-			getThreadAndRun(accessor, context, (thread: IThread) => thread.stepOut());
+			await getThreadAndRun(accessor, context, (thread: IThread) => thread.stepOut());
 		}
 	}
 });
@@ -378,8 +516,8 @@ KeybindingsRegistry.registerCommandAndKeybindingRule({
 	weight: KeybindingWeight.WorkbenchContrib + 2, // take priority over focus next part while we are debugging
 	primary: KeyCode.F6,
 	when: CONTEXT_DEBUG_STATE.isEqualTo('running'),
-	handler: (accessor: ServicesAccessor, _: string, context: CallStackContext | unknown) => {
-		getThreadAndRun(accessor, context, thread => thread.pause());
+	handler: async (accessor: ServicesAccessor, _: string, context: CallStackContext | unknown) => {
+		await getThreadAndRun(accessor, context, thread => thread.pause());
 	}
 });
 
@@ -511,17 +649,15 @@ KeybindingsRegistry.registerCommandAndKeybindingRule({
 	weight: KeybindingWeight.WorkbenchContrib + 10, // Use a stronger weight to get priority over start debugging F5 shortcut
 	primary: KeyCode.F5,
 	when: CONTEXT_DEBUG_STATE.isEqualTo('stopped'),
-	handler: (accessor: ServicesAccessor, _: string, context: CallStackContext | unknown) => {
-		getThreadAndRun(accessor, context, thread => thread.continue());
+	handler: async (accessor: ServicesAccessor, _: string, context: CallStackContext | unknown) => {
+		await getThreadAndRun(accessor, context, thread => thread.continue());
 	}
 });
 
 CommandsRegistry.registerCommand({
 	id: SHOW_LOADED_SCRIPTS_ID,
 	handler: async (accessor) => {
-
 		await showLoadedScriptMenu(accessor);
-
 	}
 });
 
@@ -585,7 +721,7 @@ KeybindingsRegistry.registerCommandAndKeybindingRule({
 		const { launch, name, getConfig } = debugService.getConfigurationManager().selectedConfiguration;
 		const config = await getConfig();
 		const configOrName = config ? Object.assign(deepClone(config), debugStartOptions?.config) : name;
-		await debugService.startDebugging(launch, configOrName, { noDebug: debugStartOptions?.noDebug, startedByUser: true }, false);
+		await debugService.startDebugging(launch, configOrName, { noDebug: debugStartOptions?.noDebug, startedByUser: true, saveBeforeStart: false });
 	}
 });
 
@@ -779,7 +915,7 @@ KeybindingsRegistry.registerCommandAndKeybindingRule({
 
 		const launch = manager.getLaunches().find(l => l.uri.toString() === launchUri) || manager.selectedConfiguration.launch;
 		if (launch) {
-			const { editor, created } = await launch.openConfigFile(false);
+			const { editor, created } = await launch.openConfigFile({ preserveFocus: false });
 			if (editor && !created) {
 				const codeEditor = <ICodeEditor>editor.getControl();
 				if (codeEditor) {

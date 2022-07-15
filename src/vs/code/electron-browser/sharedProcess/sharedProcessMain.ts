@@ -53,7 +53,6 @@ import { FollowerLogService, LoggerChannelClient, LogLevelChannelClient } from '
 import { INativeHostService } from 'vs/platform/native/electron-sandbox/native';
 import product from 'vs/platform/product/common/product';
 import { IProductService } from 'vs/platform/product/common/productService';
-import { RequestService } from 'vs/platform/request/browser/requestService';
 import { IRequestService } from 'vs/platform/request/common/request';
 import { ISharedProcessConfiguration } from 'vs/platform/sharedProcess/node/sharedProcess';
 import { IStorageService } from 'vs/platform/storage/common/storage';
@@ -64,7 +63,6 @@ import { TelemetryAppenderChannel } from 'vs/platform/telemetry/common/telemetry
 import { TelemetryLogAppender } from 'vs/platform/telemetry/common/telemetryLogAppender';
 import { TelemetryService } from 'vs/platform/telemetry/common/telemetryService';
 import { supportsTelemetry, ITelemetryAppender, NullAppender, NullTelemetryService, getPiiPathsFromEnvironment } from 'vs/platform/telemetry/common/telemetryUtils';
-import { AppInsightsAppender } from 'vs/platform/telemetry/node/appInsightsAppender';
 import { CustomEndpointTelemetryService } from 'vs/platform/telemetry/node/customEndpointTelemetryService';
 import { LocalReconnectConstants, TerminalIpcChannels, TerminalSettingId } from 'vs/platform/terminal/common/terminal';
 import { ILocalPtyService } from 'vs/platform/terminal/electron-sandbox/terminal';
@@ -107,6 +105,7 @@ import { IPolicyService, NullPolicyService } from 'vs/platform/policy/common/pol
 import { UserDataProfilesNativeService } from 'vs/platform/userDataProfile/electron-sandbox/userDataProfile';
 import { OneDataSystemWebAppender } from 'vs/platform/telemetry/browser/1dsAppender';
 import { DefaultExtensionsProfileInitService } from 'vs/platform/extensionManagement/electron-sandbox/defaultExtensionsProfileInit';
+import { SharedProcessRequestService } from 'vs/platform/request/electron-browser/sharedProcessRequestService';
 
 class SharedProcessMain extends Disposable {
 
@@ -233,7 +232,7 @@ class SharedProcessMain extends Disposable {
 		fileService.registerProvider(Schemas.vscodeUserData, userDataFileSystemProvider);
 
 		// User Data Profiles
-		const userDataProfilesService = this._register(new UserDataProfilesNativeService(this.configuration.profiles, mainProcessService, environmentService, fileService, logService));
+		const userDataProfilesService = this._register(new UserDataProfilesNativeService(this.configuration.profiles, mainProcessService, environmentService));
 		services.set(IUserDataProfilesService, userDataProfilesService);
 
 		// Configuration
@@ -255,7 +254,7 @@ class SharedProcessMain extends Disposable {
 		services.set(IUriIdentityService, new UriIdentityService(fileService));
 
 		// Request
-		services.set(IRequestService, new SyncDescriptor(RequestService));
+		services.set(IRequestService, new SharedProcessRequestService(mainProcessService, configurationService, logService));
 
 		// Checksum
 		services.set(IChecksumService, new SyncDescriptor(ChecksumService));
@@ -282,16 +281,10 @@ class SharedProcessMain extends Disposable {
 			const logAppender = new TelemetryLogAppender(loggerService, environmentService);
 			appenders.push(logAppender);
 			const { installSourcePath } = environmentService;
-			const internalTesting = configurationService.getValue<boolean>('telemetry.internalTesting');
-			if (internalTesting && productService.aiConfig?.ariaKey) {
+			if (productService.aiConfig?.ariaKey) {
 				const collectorAppender = new OneDataSystemWebAppender(configurationService, 'monacoworkbench', null, productService.aiConfig.ariaKey);
 				this._register(toDisposable(() => collectorAppender.flush())); // Ensure the 1DS appender is disposed so that it flushes remaining data
 				appenders.push(collectorAppender);
-			} else if (productService.aiConfig && productService.aiConfig.asimovKey) {
-				// Application Insights
-				const appInsightsAppender = new AppInsightsAppender('monacoworkbench', null, productService.aiConfig.asimovKey);
-				this._register(toDisposable(() => appInsightsAppender.flush())); // Ensure the AI appender is disposed so that it flushes remaining data
-				appenders.push(appInsightsAppender);
 			}
 
 			telemetryService = new TelemetryService({
