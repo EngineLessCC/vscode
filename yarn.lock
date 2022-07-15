@@ -4319,10 +4319,10 @@ electron-to-chromium@^1.4.17:
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.45.tgz#cf1144091d6683cbd45a231954a745f02fb24598"
   integrity sha512-czF9eYVuOmlY/vxyMQz2rGlNSjZpxNQYBe1gmQv7al171qOIhgyO9k7D5AKlgeTCSPKk+LHhj5ZyIdmEub9oNg==
 
-electron@20.0.0-beta.4:
-  version "20.0.0-beta.4"
-  resolved "https://registry.yarnpkg.com/electron/-/electron-20.0.0-beta.4.tgz#fcdfe96a01cff67931d7d378a287d1409af0596b"
-  integrity sha512-9h2bCib8lqIKk1EY7kBDRbIfwpk17WrJLSv57odXdDHe1vaOrsk6Nbk/nocsjls+B2Xf3AQjnXzuzLAdOMWsMw==
+electron@20.0.0-beta.5:
+  version "20.0.0-beta.5"
+  resolved "https://registry.yarnpkg.com/electron/-/electron-20.0.0-beta.5.tgz#278b8ae29d0aa17383341eaf835e43c5ffbeee93"
+  integrity sha512-C7YNHBe7y/UA+jt2M/46x+fopdikIcfYsdPgCzNw+HkpK0opoNSYTep23FovYS5kfeukCmue6xHsYwiNvxV30A==
   dependencies:
     "@electron/get" "^1.14.1"
     "@types/node" "^16.11.26"
