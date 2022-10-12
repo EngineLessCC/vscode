@@ -277,6 +277,12 @@ export class WebWorkerExtensionHost extends Disposable implements IExtensionHost
 		const [telemetryInfo, initData] = await Promise.all([this._telemetryService.getTelemetryInfo(), this._initDataProvider.getInitData()]);
 		const workspace = this._contextService.getWorkspace();
 		const deltaExtensions = this.extensions.set(initData.allExtensions, initData.myExtensions);
+		const nlsBaseUrl = this._productService.extensionsGallery?.nlsBaseUrl;
+		let nlsUrlWithDetails: URI | undefined = undefined;
+		// Only use the nlsBaseUrl if we are using a language other than the default, English.
+		if (nlsBaseUrl && this._productService.commit && !platform.Language.isDefaultVariant()) {
+			nlsUrlWithDetails = URI.joinPath(URI.parse(nlsBaseUrl), this._productService.commit, this._productService.version, platform.Language.value());
+		}
 		return {
 			commit: this._productService.commit,
 			version: this._productService.version,
@@ -287,6 +293,7 @@ export class WebWorkerExtensionHost extends Disposable implements IExtensionHost
 				appHost: this._productService.embedderIdentifier ?? (platform.isWeb ? 'web' : 'desktop'),
 				appUriScheme: this._productService.urlProtocol,
 				appLanguage: platform.language,
+				extensionTelemetryLogResource: this._environmentService.extHostTelemetryLogFile,
 				extensionDevelopmentLocationURI: this._environmentService.extensionDevelopmentLocationURI,
 				extensionTestsLocationURI: this._environmentService.extensionTestsLocationURI,
 				globalStorageHome: this._userDataProfilesService.defaultProfile.globalStorageHome,
@@ -304,6 +311,7 @@ export class WebWorkerExtensionHost extends Disposable implements IExtensionHost
 			},
 			allExtensions: deltaExtensions.toAdd,
 			myExtensions: deltaExtensions.myToAdd,
+			nlsBaseUrl: nlsUrlWithDetails,
 			telemetryInfo,
 			logLevel: this._logService.getLevel(),
 			logsLocation: this._extensionHostLogsLocation,

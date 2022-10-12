@@ -391,6 +391,8 @@ export interface IMouseTargetOverviewRuler extends IBaseMouseTarget {
 }
 export interface IMouseTargetOutsideEditor extends IBaseMouseTarget {
 	readonly type: MouseTargetType.OUTSIDE_EDITOR;
+	readonly outsidePosition: 'above' | 'below' | 'left' | 'right';
+	readonly outsideDistance: number;
 }
 /**
  * Target hit with the mouse in the editor.
@@ -799,7 +801,7 @@ export interface ICodeEditor extends editorCommon.IEditor {
 	 * @id Unique identifier of the contribution.
 	 * @return The action or null if action not found.
 	 */
-	getAction(id: string): editorCommon.IEditorAction;
+	getAction(id: string): editorCommon.IEditorAction | null;
 
 	/**
 	 * Execute a command on the editor.
@@ -1118,6 +1120,12 @@ export interface IDiffEditor extends editorCommon.IEditor {
 	 * @event
 	 */
 	readonly onDidUpdateDiff: Event<void>;
+
+	/**
+	 * An event emitted when the diff model is changed (i.e. the diff editor shows new content).
+	 * @event
+	 */
+	readonly onDidChangeModel: Event<void>;
 
 	/**
 	 * Saves current view state of the editor in a serializable object.
