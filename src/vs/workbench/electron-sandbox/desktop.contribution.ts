@@ -215,7 +215,7 @@ import product from 'vs/platform/product/common/product';
 			'window.dialogStyle': {
 				'type': 'string',
 				'enum': ['native', 'custom'],
-				'default': 'native',
+				'default': 'custom',
 				'scope': ConfigurationScope.APPLICATION,
 				'description': localize('dialogStyle', "Adjust the appearance of dialog windows.")
 			},
@@ -243,7 +243,7 @@ import product from 'vs/platform/product/common/product';
 			'window.experimental.useSandbox': { // TODO@bpasero remove me once sandbox is final
 				type: 'boolean',
 				description: localize('experimentalUseSandbox', "Experimental: When enabled, the window will have sandbox mode enabled via Electron API."),
-				default: typeof product.quality === 'string' && product.quality !== 'stable', // disabled by default in stable for now
+				default: true, // disabled by default in stable for now
 				'scope': ConfigurationScope.APPLICATION,
 				ignoreSync: true
 			},

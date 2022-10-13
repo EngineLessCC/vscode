@@ -177,7 +177,7 @@ export function useWindowControlsOverlay(configurationService: IConfigurationSer
 		return configuredUseWindowControlsOverlay;
 	}
 
-	return false; // disable by default
+	return true; // ! vivya: ~~disable~~ enable by default
 }
 
 export interface IPath<T = IEditorOptions> extends IPathData<T> {
