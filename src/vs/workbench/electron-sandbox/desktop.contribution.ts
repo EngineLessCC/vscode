@@ -201,13 +201,13 @@ import product from 'vs/platform/product/common/product';
 			'window.titleBarStyle': {
 				'type': 'string',
 				'enum': ['native', 'custom'],
-				'default': isLinux ? 'native' : 'custom',
+				'default': 'custom',
 				'scope': ConfigurationScope.APPLICATION,
 				'description': localize('titleBarStyle', "Adjust the appearance of the window title bar. On Linux and Windows, this setting also affects the application and context menu appearances. Changes require a full restart to apply.")
 			},
 			'window.experimental.windowControlsOverlay.enabled': {
 				'type': 'boolean',
-				'default': false,
+				'default': true,
 				'scope': ConfigurationScope.APPLICATION,
 				'description': localize('windowControlsOverlay', "Use window controls provided by the platform instead of our HTML-based window controls. Changes require a full restart to apply."),
 				'included': isWindows

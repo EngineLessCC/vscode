@@ -94,7 +94,8 @@
     "xterm-addon-webgl": "0.14.0-beta.20",
     "xterm-headless": "5.1.0-beta.29",
     "yauzl": "^2.9.2",
-    "yazl": "^2.4.3"
+    "yazl": "^2.4.3",
+    "nan": "^2.17.0"
   },
   "devDependencies": {
     "7zip": "0.0.6",
@@ -235,6 +236,7 @@
   },
   "resolutions": {
     "elliptic": "^6.5.3",
-    "nwmatcher": "^1.4.4"
+    "nwmatcher": "^1.4.4",
+    "nan": "^2.17.0"
   }
 }
