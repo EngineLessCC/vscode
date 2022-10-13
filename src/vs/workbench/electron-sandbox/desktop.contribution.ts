@@ -26,7 +26,6 @@ import { IConfigurationService } from 'vs/platform/configuration/common/configur
 import { ShutdownReason } from 'vs/workbench/services/lifecycle/common/lifecycle';
 import { NativeWindow } from 'vs/workbench/electron-sandbox/window';
 import { ModifierKeyEmitter } from 'vs/base/browser/dom';
-import product from 'vs/platform/product/common/product';
 
 // Actions
 (function registerActions(): void {
