@@ -140,7 +140,9 @@ export class StickyLineCandidateProvider extends Disposable {
 				this._model = undefined;
 			}
 		}
-		clearTimeout(resetHandle);
+		if (resetHandle !== undefined) {
+			clearTimeout(resetHandle);
+		}
 	}
 
 	private updateIndex(index: number) {
