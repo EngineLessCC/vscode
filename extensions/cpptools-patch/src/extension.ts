@@ -22,7 +22,7 @@ function GetCppToolsPath() {
 }
 
 async function GetOffset(fullpath: string): Promise<number> {
-	const pattern = '48 8B C4 48 89 58 08 48 89 70 18 48 89 78 20 55 41 54 41 55 41 56 41 57 48 8D A8 ? ? ? ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 45 33 F6 4C 89 74 24 ? 4C 89 74 24 ? 45 8D 66 0F 4C 89 64 24 ? 44 88 74 24 ? 49 83 CF FF 49 8B DF 48 FF C3 44 38 34 1A 75 F7 48 8D 4C 24 ? 49 3B DC 77 14 48 89 5C 24 ? 4C 8B C3 E8 ? ? ? ? 44 88 74 1C ? EB 0C 4C 8B CA 48 8B D3 E8 ? ? ? ? 90 41 BD ? ? ? ? 48 8B 54 24 ? 48 8B 4C 24 ? 48 83 7C 24 ? ? 0F 82 ? ? ? ? 4C 89 B5 ? ? ? ? 4D 8B C6 48 8D 44 24 ? 48 83 FA 10 48 0F 43 C1';
+	const pattern = '48 8B C4 48 89 58 08 48 89 70 18 48 89 78 20 55 41 54 41 55 41 56 41 57 48 8D A8';
 	let matchOffset = -1;
 	let idx = 0;
 	let offset = 0;
