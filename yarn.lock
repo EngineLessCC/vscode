@@ -1253,10 +1253,10 @@
   resolved "https://registry.yarnpkg.com/@vscode/iconv-lite-umd/-/iconv-lite-umd-0.7.0.tgz#d2f1e0664ee6036408f9743fee264ea0699b0e48"
   integrity sha512-bRRFxLfg5dtAyl5XyiVWz/ZBPahpOpPrNYnnHpOpUZvam4tKH35wdhP4Kj6PbM0+KdliOsPzbGWpkxcdpNB/sg==
 
-"@vscode/l10n-dev@0.0.15":
-  version "0.0.15"
-  resolved "https://registry.yarnpkg.com/@vscode/l10n-dev/-/l10n-dev-0.0.15.tgz#677b527987ccd39e32c50956f139736a788061d6"
-  integrity sha512-zLuo/pa+FtnFrVq/7M8VHshgejNZ6TvnRW9/um1pLkg92PZ9glDgmwXUv1AdpBu5KNzgH9odiMKS4YQDkS12wQ==
+"@vscode/l10n-dev@0.0.18":
+  version "0.0.18"
+  resolved "https://registry.yarnpkg.com/@vscode/l10n-dev/-/l10n-dev-0.0.18.tgz#80a8cf6ef13c7fe1796be7b0007d71993bd1832f"
+  integrity sha512-pEKLMnlg7hlxFrZLqcyJe08olmj6KVs2Rof7MVB5rN0D6NOKPBRtkQ176TuMUmW863EDV5WQUgNzOGa2nHBSSQ==
   dependencies:
     deepmerge-json "^1.5.0"
     glob "^8.0.3"
@@ -10868,10 +10868,10 @@ typescript@^4.7.4:
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.8.4.tgz#c464abca159669597be5f96b8943500b238e60e6"
   integrity sha512-QCh+85mCy+h0IGff8r5XWzOVSbBO+KfeYrMQh7NJ58QujwcE22u+NUSmUxqF+un70P9GXKxa2HCNiTTMJknyjQ==
 
-typescript@^5.0.0-dev.20221103:
-  version "5.0.0-dev.20221103"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.0.0-dev.20221103.tgz#673cc041603bb7faed88f41ca5e9481c678f33d8"
-  integrity sha512-hfqcsmiJ+5ktli1OAkwu4PyDDJ3kWW3tiUofd2t1uxwmni3ZT3Mrv1m2dZFg9VNDKqHrkt49izB3tAtD2bsyGw==
+typescript@^5.0.0-dev.20221108:
+  version "5.0.0-dev.20221109"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.0.0-dev.20221109.tgz#f51a0731a129bbab08c12b776c8b7ff42c6e98b2"
+  integrity sha512-DAVRpl2535lb8CL7WjpHAb0dnhsbsTUVLQW5jBxS4RyRYA5Tq17kDGYQTvT0JryOwp6PksgjDdUKG2B9ElU5wg==
 
 typical@^4.0.0:
   version "4.0.0"
