@@ -15,6 +15,7 @@ import { IJSONSchema } from 'vs/base/common/jsonSchema';
 import * as arrays from 'vs/base/common/arrays';
 import * as objects from 'vs/base/common/objects';
 import { EDITOR_MODEL_DEFAULTS } from 'vs/editor/common/core/textModelDefaults';
+import { IDocumentDiffProvider } from 'vs/editor/common/diff/documentDiffProvider';
 
 //#region typed options
 
@@ -604,7 +605,7 @@ export interface IEditorOptions {
 	/**
 	 * The font family
 	 */
-	fontFamily?: string;
+	fontFamily?: string | string[];
 	/**
 	 * The font weight
 	 */
@@ -739,7 +740,7 @@ export interface IDiffEditorBaseOptions {
 	/**
 	 * Diff Algorithm
 	*/
-	diffAlgorithm?: 'smart' | 'experimental';
+	diffAlgorithm?: 'smart' | 'experimental' | IDocumentDiffProvider;
 }
 
 /**
@@ -1595,6 +1596,44 @@ export class EditorFontLigatures extends BaseEditorOption<EditorOption.fontLigat
 			return EditorFontLigatures.ON;
 		}
 		return EditorFontLigatures.OFF;
+	}
+}
+
+//#endregion
+
+//#region fontFamily
+/**
+ * @internal
+ */
+export class EditorFontFamily extends BaseEditorOption<EditorOption.fontFamily, string | string[], string> {
+	constructor() {
+		super(
+			EditorOption.fontFamily, 'fontFamily', EDITOR_FONT_DEFAULTS.fontFamily,
+			{
+				anyOf: [
+					{
+						type: 'string',
+					},
+					{
+						type: 'array',
+						items: {
+							type: 'string',
+						},
+					}
+				],
+				description: nls.localize('fontFamily', "Controls the font family."),
+				default: EDITOR_FONT_DEFAULTS.fontFamily
+			}
+		);
+	}
+	public validate(input: any): string {
+		if (typeof input === 'string') {
+			return input;
+		}
+		if (Array.isArray(input) && input.length > 0) {
+			return input.map((f: string) => { return JSON.stringify(f); }).join(',');
+		}
+		return this.defaultValue;
 	}
 }
 
@@ -5001,10 +5040,7 @@ export const EditorOptions = {
 		EditorOption.unfoldOnClickAfterEndOfLine, 'unfoldOnClickAfterEndOfLine', false,
 		{ description: nls.localize('unfoldOnClickAfterEndOfLine', "Controls whether clicking on the empty content after a folded line will unfold the line.") }
 	)),
-	fontFamily: register(new EditorStringOption(
-		EditorOption.fontFamily, 'fontFamily', EDITOR_FONT_DEFAULTS.fontFamily,
-		{ description: nls.localize('fontFamily', "Controls the font family.") }
-	)),
+	fontFamily: register(new EditorFontFamily()),
 	fontInfo: register(new EditorFontInfo()),
 	fontLigatures2: register(new EditorFontLigatures()),
 	fontSize: register(new EditorFontSize()),
