@@ -25,16 +25,6 @@
 	"win32ShellNameShort": "C&odeVCCS",
 	"darwinBundleIdentifier": "com.visualstudio.code.vccs",
 	"linuxIconName": "com.visualstudio.code.vccs",
-	"tunnelApplicationConfig": {
-		"authenticationProviders": {
-			"github": {
-				"scopes": [
-					"user:email",
-					"read:org"
-				]
-			}
-		}
-	},
 	"licenseFileName": "LICENSE.txt",
 	"reportIssueUrl": "https://github.com/microsoft/vscode/issues/new",
 	"urlProtocol": "code-vccs",

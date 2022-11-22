@@ -242,7 +242,7 @@ import { ModifierKeyEmitter } from 'vs/base/browser/dom';
 			'window.experimental.useSandbox': { // TODO@bpasero remove me once sandbox is final
 				type: 'boolean',
 				description: localize('experimentalUseSandbox', "Experimental: When enabled, the window will have sandbox mode enabled via Electron API."),
-				default: true, // disabled by default in stable for now
+				default: true,
 				'scope': ConfigurationScope.APPLICATION,
 				ignoreSync: true
 			},
