@@ -168,6 +168,7 @@ import { ModifierKeyEmitter } from 'vs/base/browser/dom';
 			'window.zoomLevel': {
 				'type': 'number',
 				'default': 0,
+				'minimum': -5,
 				'description': localize('zoomLevel', "Adjust the zoom level of the window. The original size is 0 and each increment above (e.g. 1) or below (e.g. -1) represents zooming 20% larger or smaller. You can also enter decimals to adjust the zoom level with a finer granularity."),
 				ignoreSync: true,
 				tags: ['accessibility']
@@ -333,7 +334,7 @@ import { ModifierKeyEmitter } from 'vs/base/browser/dom';
 			},
 			'log-level': {
 				type: 'string',
-				description: localize('argv.logLevel', "Log level to use. Default is 'info'. Allowed values are 'critical', 'error', 'warn', 'info', 'debug', 'trace', 'off'.")
+				description: localize('argv.logLevel', "Log level to use. Default is 'info'. Allowed values are 'error', 'warn', 'info', 'debug', 'trace', 'off'.")
 			}
 		}
 	};
