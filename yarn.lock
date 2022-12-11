@@ -10877,10 +10877,10 @@ typescript@^4.7.4:
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.8.4.tgz#c464abca159669597be5f96b8943500b238e60e6"
   integrity sha512-QCh+85mCy+h0IGff8r5XWzOVSbBO+KfeYrMQh7NJ58QujwcE22u+NUSmUxqF+un70P9GXKxa2HCNiTTMJknyjQ==
 
-typescript@^5.0.0-dev.20221108:
-  version "5.0.0-dev.20221109"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.0.0-dev.20221109.tgz#f51a0731a129bbab08c12b776c8b7ff42c6e98b2"
-  integrity sha512-DAVRpl2535lb8CL7WjpHAb0dnhsbsTUVLQW5jBxS4RyRYA5Tq17kDGYQTvT0JryOwp6PksgjDdUKG2B9ElU5wg==
+typescript@^5.0.0-dev.20221206:
+  version "5.0.0-dev.20221210"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.0.0-dev.20221210.tgz#2dd9409cfcfd239ee5d6a418e48a7ffb638c3eb9"
+  integrity sha512-j+HrsNSe+sCqEJdqKT7NZi6MdeOUutCYd+oxzMpkoWFK87h6yqRs1suxK/ueic0Oou7zZMeT0XD3eqFiY8VLQw==
 
 typical@^4.0.0:
   version "4.0.0"
@@ -11314,10 +11314,10 @@ vscode-regexpp@^3.1.0:
   resolved "https://registry.yarnpkg.com/vscode-regexpp/-/vscode-regexpp-3.1.0.tgz#42d059b6fffe99bd42939c0d013f632f0cad823f"
   integrity sha512-pqtN65VC1jRLawfluX4Y80MMG0DHJydWhe5ZwMHewZD6sys4LbU6lHwFAHxeuaVE6Y6+xZOtAw+9hvq7/0ejkg==
 
-vscode-textmate@7.0.1:
-  version "7.0.1"
-  resolved "https://registry.yarnpkg.com/vscode-textmate/-/vscode-textmate-7.0.1.tgz#8118a32b02735dccd14f893b495fa5389ad7de79"
-  integrity sha512-zQ5U/nuXAAMsh691FtV0wPz89nSkHbs+IQV8FDk+wew9BlSDhf4UmWGlWJfTR2Ti6xZv87Tj5fENzKf6Qk7aLw==
+vscode-textmate@8.0.0:
+  version "8.0.0"
+  resolved "https://registry.yarnpkg.com/vscode-textmate/-/vscode-textmate-8.0.0.tgz#2c7a3b1163ef0441097e0b5d6389cd5504b59e5d"
+  integrity sha512-AFbieoL7a5LMqcnOF04ji+rpXadgOXnZsxQr//r83kLPr7biP7am3g9zbaZIaBGwBRWeSvoMD4mgPdX3e4NWBg==
 
 vscode-uri@^3.0.6:
   version "3.0.6"
