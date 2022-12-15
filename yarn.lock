@@ -1272,13 +1272,12 @@
     https-proxy-agent "^5.0.0"
     proxy-from-env "^1.1.0"
 
-"@vscode/sqlite3@5.1.2-vscode":
-  version "5.1.2-vscode"
-  resolved "https://registry.yarnpkg.com/@vscode/sqlite3/-/sqlite3-5.1.2-vscode.tgz#ba15962d23ad784a43ecbaaa22c93f17f93b2400"
-  integrity sha512-CIH0BWzQJA97teb1f3aAoyylztPdg1WqThHEvVPWXr8UO0+VtIa+ha20Q2PGYV4AGfPtkPnhUrSYpJDxnVhW/g==
+"@vscode/sqlite3@5.0.8":
+  version "5.0.8"
+  resolved "https://registry.yarnpkg.com/@vscode/sqlite3/-/sqlite3-5.0.8.tgz#72b07061c5f90a9dd598a5506f598fcc817fab90"
+  integrity sha512-6wvQdMjpi1kwYI5mfzm98siEQb2mlBKX4xdNtJFj/uNqb6wqd3JOhk+5FL7geR0hduXE5lHjv+q69jtsEtUJDA==
   dependencies:
     node-addon-api "^4.2.0"
-    tar "^6.1.11"
 
 "@vscode/sudo-prompt@9.3.1":
   version "9.3.1"
@@ -7569,15 +7568,10 @@ mute-stream@0.0.7:
   resolved "https://registry.yarnpkg.com/mute-stream/-/mute-stream-0.0.7.tgz#3075ce93bc21b8fab43e1bc4da7e8115ed1e7bab"
   integrity sha1-MHXOk7whuPq0PhvE2n6BFe0ee6s=
 
-nan@^2.12.1, nan@^2.13.2:
-  version "2.14.2"
-  resolved "https://registry.yarnpkg.com/nan/-/nan-2.14.2.tgz#f5376400695168f4cc694ac9393d0c9585eeea19"
-  integrity sha512-M2ufzIiINKCuDfBSAUr1vWQ+vuVcA9kqx8JJUsbQi6yf1uGRyb7HfpdfUr5qLXf3B/t8dPvcjhKMmlfnP47EzQ==
-
-nan@^2.14.0:
-  version "2.15.0"
-  resolved "https://registry.yarnpkg.com/nan/-/nan-2.15.0.tgz#3f34a473ff18e15c1b5626b62903b5ad6e665fee"
-  integrity sha512-8ZtvEnA2c5aYCZYd1cvgdnU6cqwixRoYg70xPLWUws5ORTa/lnw+u4amixRS/Ac5U5mQVgp9pnlSUnbNWFaWZQ==
+nan@^2.12.1, nan@^2.13.2, nan@^2.14.0, nan@^2.17.0:
+  version "2.17.0"
+  resolved "https://registry.yarnpkg.com/nan/-/nan-2.17.0.tgz#c0150a2368a182f033e9aa5195ec76ea41a199cb"
+  integrity sha512-2ZTgtl0nJsO0KQCjEpxcIr5D+Yv90plTitZt9JBfQvVJDS5seMl3FOvsh3+9CoYWXf/1l5OaZzzF6nDm4cagaQ==
 
 nanoid@3.3.1:
   version "3.3.1"
@@ -9720,10 +9714,10 @@ simple-swizzle@^0.2.2:
   dependencies:
     is-arrayish "^0.3.1"
 
-sinon-test@^3.1.3:
-  version "3.1.3"
-  resolved "https://registry.yarnpkg.com/sinon-test/-/sinon-test-3.1.3.tgz#b261e0efd0b479891a243201387f957d7ca61daa"
-  integrity sha512-jBDvPVW2z8uAoiud3Nqc6+e8+WX6UTB1gPQuYXK00mSnp9m/JYyeLdBjLlqbnk1DVmsgRCAHSoXYPNLHp0t56Q==
+sinon-test@^3.1.0:
+  version "3.1.4"
+  resolved "https://registry.yarnpkg.com/sinon-test/-/sinon-test-3.1.4.tgz#16a26b11585b768e16fe429c3132ef42eab1fee0"
+  integrity sha512-QxTwXu0RFv7aVNr90+Ht8Lnw0dtoyGJh75FWAT1fH3WJG+lbVZkm8M3Md8IKzOBLtQwawb9GJOTfFibJkauP5Q==
 
 sinon@^11.1.1:
   version "11.1.1"
@@ -9874,14 +9868,14 @@ sparkles@^1.0.0:
   resolved "https://registry.yarnpkg.com/sparkles/-/sparkles-1.0.1.tgz#008db65edce6c50eec0c5e228e1945061dd0437c"
   integrity sha512-dSO0DDYUahUt/0/pD/Is3VIm5TGJjludZ0HVymmhYF6eNA53PVLhnUk0znSYbH8IYBuJdCE+1luR22jNLMaQdw==
 
-spdlog@^0.13.0:
-  version "0.13.6"
-  resolved "https://registry.yarnpkg.com/spdlog/-/spdlog-0.13.6.tgz#26b2e13d46cbf8f2334c12ba2a8cc82de5a28f02"
-  integrity sha512-iGqDoA88G3Rv3lkbVQglTulp3nv12FzND6LDC7cOZ+OoFvWnXVb3+Ebhed60oZ6+IWWGwDtjXK6ympwr7C1XmQ==
+spdlog@^0.13.6:
+  version "0.13.7"
+  resolved "https://registry.yarnpkg.com/spdlog/-/spdlog-0.13.7.tgz#719a972be103e473770202e37dca1c9d80502180"
+  integrity sha512-DiWxvyHuDJKfNuanSnizY2pmqZGaSHej3xpOD4LQ+kkT3oLWpCXI6VRFDnziyXBQKCl8kmyaYnOu9QBhf1WEXQ==
   dependencies:
     bindings "^1.5.0"
     mkdirp "^0.5.5"
-    nan "^2.14.0"
+    nan "^2.17.0"
 
 spdx-correct@^3.0.0:
   version "3.1.1"
@@ -10259,7 +10253,7 @@ strip-json-comments@^2.0.1, strip-json-comments@~2.0.1:
   resolved "https://registry.yarnpkg.com/strip-json-comments/-/strip-json-comments-2.0.1.tgz#3c531942e908c2697c0ec344858c286c7ca0a60a"
   integrity sha1-PFMZQukIwml8DsNEhYwobHygpgo=
 
-style-loader@^1.3.0:
+style-loader@^1.0.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/style-loader/-/style-loader-1.3.0.tgz#828b4a3b3b7e7aa5847ce7bae9e874512114249e"
   integrity sha512-V7TCORko8rs9rIqkSrlMfkqA63DfoGBBJmK1kKGCcSi+BWb4cqz0SRsnp4l6rU5iwOEd0/2ePv68SV22VXon4Q==
@@ -10423,18 +10417,6 @@ tar@^6.0.2:
   version "6.0.5"
   resolved "https://registry.yarnpkg.com/tar/-/tar-6.0.5.tgz#bde815086e10b39f1dcd298e89d596e1535e200f"
   integrity sha512-0b4HOimQHj9nXNEAA7zWwMM91Zhhba3pspja6sQbgTpynOJf+bkjBnfybNYzbpLbnwXnbyB4LOREvlyXLkCHSg==
-  dependencies:
-    chownr "^2.0.0"
-    fs-minipass "^2.0.0"
-    minipass "^3.0.0"
-    minizlib "^2.1.1"
-    mkdirp "^1.0.3"
-    yallist "^4.0.0"
-
-tar@^6.1.11:
-  version "6.1.12"
-  resolved "https://registry.yarnpkg.com/tar/-/tar-6.1.12.tgz#3b742fb05669b55671fb769ab67a7791ea1a62e6"
-  integrity sha512-jU4TdemS31uABHd+Lt5WEYJuzn+TJTCBLljvIAHZOz6M9Os5pJ4dD+vRFLxPa/n3T0iEFzpi+0x1UfuDZYbRMw==
   dependencies:
     chownr "^2.0.0"
     fs-minipass "^2.0.0"
