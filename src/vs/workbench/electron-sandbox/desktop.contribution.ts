@@ -26,6 +26,8 @@ import { IConfigurationService } from 'vs/platform/configuration/common/configur
 import { ShutdownReason } from 'vs/workbench/services/lifecycle/common/lifecycle';
 import { NativeWindow } from 'vs/workbench/electron-sandbox/window';
 import { ModifierKeyEmitter } from 'vs/base/browser/dom';
+import product from 'vs/platform/product/common/product';
+import { applicationConfigurationNodeBase } from 'vs/workbench/common/configuration';
 
 // Actions
 (function registerActions(): void {
@@ -127,6 +129,22 @@ import { ModifierKeyEmitter } from 'vs/base/browser/dom';
 (function registerConfiguration(): void {
 	const registry = Registry.as<IConfigurationRegistry>(ConfigurationExtensions.Configuration);
 
+	// Application
+	registry.registerConfiguration({
+		...applicationConfigurationNodeBase,
+		'properties': {
+			'application.shellEnvironmentResolutionTimeout': {
+				'type': 'number',
+				'default': 10,
+				'minimum': 1,
+				'maximum': 120,
+				'included': !isWindows,
+				'scope': ConfigurationScope.APPLICATION,
+				'markdownDescription': localize('application.shellEnvironmentResolutionTimeout', "Controls the timeout in seconds before giving up resolving the shell environment when the application is not already launched from a terminal. See our [documentation](https://go.microsoft.com/fwlink/?linkid=2149667) for more information.")
+			}
+		}
+	});
+
 	// Window
 	registry.registerConfiguration({
 		'id': 'window',
@@ -196,12 +214,12 @@ import { ModifierKeyEmitter } from 'vs/base/browser/dom';
 				'type': 'boolean',
 				'default': false,
 				'scope': ConfigurationScope.APPLICATION,
-				'markdownDescription': localize('window.doubleClickIconToClose', "If enabled, double clicking the application icon in the title bar will close the window and the window cannot be dragged by the icon. This setting only has an effect when `#window.titleBarStyle#` is set to `custom`.")
+				'markdownDescription': localize('window.doubleClickIconToClose', "If enabled, this setting will close the window when the application icon in the title bar is double-clicked. The window will not be able to be dragged by the icon. This setting is effective only if `#window.titleBarStyle#` is set to `custom`.")
 			},
 			'window.titleBarStyle': {
 				'type': 'string',
 				'enum': ['native', 'custom'],
-				'default': 'custom',
+				'default': isLinux ? 'native' : 'custom',
 				'scope': ConfigurationScope.APPLICATION,
 				'description': localize('titleBarStyle', "Adjust the appearance of the window title bar. On Linux and Windows, this setting also affects the application and context menu appearances. Changes require a full restart to apply.")
 			},
@@ -215,7 +233,7 @@ import { ModifierKeyEmitter } from 'vs/base/browser/dom';
 			'window.dialogStyle': {
 				'type': 'string',
 				'enum': ['native', 'custom'],
-				'default': 'custom',
+				'default': 'native',
 				'scope': ConfigurationScope.APPLICATION,
 				'description': localize('dialogStyle', "Adjust the appearance of dialog windows.")
 			},
@@ -243,7 +261,8 @@ import { ModifierKeyEmitter } from 'vs/base/browser/dom';
 			'window.experimental.useSandbox': { // TODO@bpasero remove me once sandbox is final
 				type: 'boolean',
 				description: localize('experimentalUseSandbox', "Experimental: When enabled, the window will have sandbox mode enabled via Electron API."),
-				default: true,
+				default: typeof product.quality === 'string' && product.quality !== 'stable', // disabled by default in stable for now
+				tags: product.quality === 'stable' ? ['experimental'] : undefined,
 				'scope': ConfigurationScope.APPLICATION,
 				ignoreSync: true
 			},
