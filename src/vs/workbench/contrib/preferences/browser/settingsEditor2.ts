@@ -336,7 +336,7 @@ export class SettingsEditor2 extends EditorPane {
 			return;
 		}
 
-		const model = await this.input.resolve();
+		const model = await this.input.resolve(options);
 		if (token.isCancellationRequested || !(model instanceof Settings2EditorModel)) {
 			return;
 		}
@@ -1744,7 +1744,7 @@ class SyncControls extends Disposable {
 		const last = this.userDataSyncService.lastSyncTime;
 		let label: string;
 		if (typeof last === 'number') {
-			const d = fromNow(last, true);
+			const d = fromNow(last, true, undefined, true);
 			label = localize('lastSyncedLabel', "Last synced: {0}", d);
 		} else {
 			label = '';
