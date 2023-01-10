@@ -243,7 +243,7 @@ export class TestingPeekOpener extends Disposable implements ITestingPeekOpener 
 			return;
 		}
 
-		if (evt.result.request.isAutoRun && !getTestingConfiguration(this.configuration, TestingConfigKeys.AutoOpenPeekViewDuringAutoRun)) {
+		if (evt.result.request.continuous && !getTestingConfiguration(this.configuration, TestingConfigKeys.AutoOpenPeekViewDuringContinuousRun)) {
 			return;
 		}
 
@@ -957,7 +957,7 @@ class MarkdownTestMessagePeek extends Disposable implements IPeekOutputRenderer 
 
 		this.textPreview.value = new ScrollableMarkdownMessage(
 			this.container,
-			this.markdown.getValue(),
+			this.markdown.value,
 			message.message as IMarkdownString,
 		);
 	}

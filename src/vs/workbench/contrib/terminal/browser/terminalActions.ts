@@ -325,7 +325,21 @@ export function registerTerminalActions() {
 				title: { value: localize('workbench.action.terminal.runRecentCommand', "Run Recent Command..."), original: 'Run Recent Command...' },
 				f1: true,
 				category,
-				precondition: ContextKeyExpr.or(TerminalContextKeys.processSupported, TerminalContextKeys.terminalHasBeenCreated)
+				precondition: ContextKeyExpr.or(TerminalContextKeys.processSupported, TerminalContextKeys.terminalHasBeenCreated),
+				keybinding: [
+					{
+						primary: KeyMod.CtrlCmd | KeyCode.KeyR,
+						mac: { primary: KeyMod.WinCtrl | KeyCode.KeyR },
+						when: ContextKeyExpr.and(TerminalContextKeys.focus, CONTEXT_ACCESSIBILITY_MODE_ENABLED),
+						weight: KeybindingWeight.WorkbenchContrib
+					},
+					{
+						primary: KeyMod.CtrlCmd | KeyMod.Alt | KeyCode.KeyR,
+						mac: { primary: KeyMod.WinCtrl | KeyMod.Alt | KeyCode.KeyR },
+						when: ContextKeyExpr.and(TerminalContextKeys.focus, CONTEXT_ACCESSIBILITY_MODE_ENABLED.negate()),
+						weight: KeybindingWeight.WorkbenchContrib
+					}
+				]
 			});
 		}
 		async run(accessor: ServicesAccessor): Promise<void> {
@@ -375,7 +389,12 @@ export function registerTerminalActions() {
 				title: { value: localize('workbench.action.terminal.goToRecentDirectory', "Go to Recent Directory..."), original: 'Go to Recent Directory...' },
 				f1: true,
 				category,
-				precondition: ContextKeyExpr.or(TerminalContextKeys.processSupported, TerminalContextKeys.terminalHasBeenCreated)
+				precondition: ContextKeyExpr.or(TerminalContextKeys.processSupported, TerminalContextKeys.terminalHasBeenCreated),
+				keybinding: {
+					primary: KeyMod.CtrlCmd | KeyCode.KeyG,
+					when: TerminalContextKeys.focus,
+					weight: KeybindingWeight.WorkbenchContrib
+				}
 			});
 		}
 		async run(accessor: ServicesAccessor): Promise<void> {
@@ -1091,7 +1110,7 @@ export function registerTerminalActions() {
 			});
 		}
 		run(accessor: ServicesAccessor) {
-			accessor.get(ITerminalService).activeInstance?.findWidget.getValue().reveal();
+			accessor.get(ITerminalService).activeInstance?.findWidget.value.reveal();
 		}
 	});
 	registerAction2(class extends Action2 {
@@ -1111,7 +1130,7 @@ export function registerTerminalActions() {
 			});
 		}
 		run(accessor: ServicesAccessor) {
-			accessor.get(ITerminalService).activeInstance?.findWidget.getValue().hide();
+			accessor.get(ITerminalService).activeInstance?.findWidget.value.hide();
 		}
 	});
 
@@ -1457,7 +1476,7 @@ export function registerTerminalActions() {
 		}
 		run(accessor: ServicesAccessor) {
 			const terminalService = accessor.get(ITerminalService);
-			const state = terminalService.activeInstance?.findWidget.getValue().findState;
+			const state = terminalService.activeInstance?.findWidget.value.findState;
 			state?.change({ isRegex: !state.isRegex }, false);
 		}
 	});
@@ -1479,7 +1498,7 @@ export function registerTerminalActions() {
 		}
 		run(accessor: ServicesAccessor) {
 			const terminalService = accessor.get(ITerminalService);
-			const state = terminalService.activeInstance?.findWidget.getValue().findState;
+			const state = terminalService.activeInstance?.findWidget.value.findState;
 			state?.change({ wholeWord: !state.wholeWord }, false);
 		}
 	});
@@ -1501,7 +1520,7 @@ export function registerTerminalActions() {
 		}
 		run(accessor: ServicesAccessor) {
 			const terminalService = accessor.get(ITerminalService);
-			const state = terminalService.activeInstance?.findWidget.getValue().findState;
+			const state = terminalService.activeInstance?.findWidget.value.findState;
 			state?.change({ matchCase: !state.matchCase }, false);
 		}
 	});
@@ -1530,7 +1549,7 @@ export function registerTerminalActions() {
 		}
 		run(accessor: ServicesAccessor) {
 			const terminalService = accessor.get(ITerminalService);
-			const findWidget = terminalService.activeInstance?.findWidget.getValue();
+			const findWidget = terminalService.activeInstance?.findWidget.value;
 			if (findWidget) {
 				findWidget.show();
 				findWidget.find(false);
@@ -1562,7 +1581,7 @@ export function registerTerminalActions() {
 		}
 		run(accessor: ServicesAccessor) {
 			const terminalService = accessor.get(ITerminalService);
-			const findWidget = terminalService.activeInstance?.findWidget.getValue();
+			const findWidget = terminalService.activeInstance?.findWidget.value;
 			if (findWidget) {
 				findWidget.show();
 				findWidget.find(true);
