@@ -195,10 +195,7 @@ export class ModelService extends Disposable implements IModelService {
 		if (config.editor && typeof config.editor.indentSize !== 'undefined' && config.editor.indentSize !== 'tabSize') {
 			const parsedIndentSize = parseInt(config.editor.indentSize, 10);
 			if (!isNaN(parsedIndentSize)) {
-				indentSize = parsedIndentSize;
-			}
-			if (indentSize < 1) {
-				indentSize = 1;
+				indentSize = Math.max(parsedIndentSize, 1);
 			}
 		}
 
@@ -292,7 +289,7 @@ export class ModelService extends Disposable implements IModelService {
 			const language = modelData.model.getLanguageId();
 			const uri = modelData.model.uri;
 
-			if (e && !e.affectsConfiguration('editor', { overrideIdentifier: language, resource: uri })) {
+			if (e && !e.affectsConfiguration('editor', { overrideIdentifier: language, resource: uri }) && !e.affectsConfiguration('files.eol', { overrideIdentifier: language, resource: uri })) {
 				continue; // perf: skip if this model is not affected by configuration change
 			}
 
