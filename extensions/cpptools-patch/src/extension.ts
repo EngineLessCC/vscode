@@ -21,8 +21,7 @@ function GetCppToolsPath() {
 	return path;
 }
 
-async function GetOffset(fullpath: string): Promise<number> {
-	const pattern = '48 8B C4 48 89 58 08 48 89 70 18 48 89 78 20 55 41 54 41 55 41 56 41 57 48 8D A8';
+async function GetOffset(fullpath: string, pattern: string): Promise<number> {
 	let matchOffset = -1;
 	let idx = 0;
 	let offset = 0;
@@ -96,7 +95,10 @@ async function DoTheThing() {
 		console.log('cpptools-patch: path is null');
 		return;
 	}
-	const offset = await GetOffset(path);
+	let offset = await GetOffset(path, "48 8B C4 48 89 58 08 48 89 70 18 48 89 78 20 55 41 54 41 55 41 56 41 57 48 8D A8");
+	if (offset === -1) {
+		offset = await GetOffset(path, "48 89 5C 24 08 48 89 74 24 18 55 57 41 54 41 55 41 56 48 8D AC 24 50 FF FF FF");
+	}
 	console.log('cpptools-patch: matched pattern at offset ' + offset.toString(16));
 	if (offset === -1) {
 		console.log('cpptools-patch: offset is -1');
