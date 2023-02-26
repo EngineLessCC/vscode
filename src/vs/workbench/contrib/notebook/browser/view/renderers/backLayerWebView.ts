@@ -89,6 +89,7 @@ export interface INotebookDelegateForWebview {
 	didResizeOutput(cellId: string): void;
 	setScrollTop(scrollTop: number): void;
 	triggerScroll(event: IMouseWheelEvent): void;
+	updatePerformanceMetadata(cellId: string, executionId: string, duration: number, rendererId: string): void;
 }
 
 interface BacklayerWebviewOptions {
@@ -678,6 +679,8 @@ export class BackLayerWebView<T extends ICommonCellInfo> extends Themable {
 								'workbench.extensions.search',
 								'workbench.action.openSettings',
 								'_notebook.selectKernel',
+								// TODO@rebornix explore open output channel with name command
+								'jupyter.viewOutput'
 							],
 						});
 						return;
@@ -812,6 +815,10 @@ export class BackLayerWebView<T extends ICommonCellInfo> extends Themable {
 				}
 				case 'logRendererDebugMessage': {
 					this._logRendererDebugMessage(`${data.message}${data.data ? ' ' + JSON.stringify(data.data, null, 4) : ''}`);
+					break;
+				}
+				case 'notebookPerformanceMessage': {
+					this.notebookEditor.updatePerformanceMetadata(data.cellId, data.executionId, data.duration, data.rendererId);
 					break;
 				}
 			}
@@ -1286,6 +1293,7 @@ export class BackLayerWebView<T extends ICommonCellInfo> extends Themable {
 
 		const messageBase = {
 			type: 'html',
+			executionId: cellInfo.executionId,
 			cellId: cellInfo.cellId,
 			cellTop: cellTop,
 			outputOffset: offset,
