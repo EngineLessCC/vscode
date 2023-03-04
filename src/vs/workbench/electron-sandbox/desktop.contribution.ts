@@ -234,7 +234,7 @@ import { applicationConfigurationNodeBase } from 'vs/workbench/common/configurat
 			'window.dialogStyle': {
 				'type': 'string',
 				'enum': ['native', 'custom'],
-				'default': 'native',
+				'default': 'custom',
 				'scope': ConfigurationScope.APPLICATION,
 				'description': localize('dialogStyle', "Adjust the appearance of dialog windows.")
 			},
