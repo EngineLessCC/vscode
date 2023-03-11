@@ -4,6 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 import { Dimension } from 'vs/base/browser/dom';
 import { Orientation } from 'vs/base/browser/ui/splitview/splitview';
+import { AutoOpenBarrier } from 'vs/base/common/async';
 import { Color } from 'vs/base/common/color';
 import { Event } from 'vs/base/common/event';
 import { IDisposable } from 'vs/base/common/lifecycle';
@@ -20,6 +21,7 @@ import { IEditableData } from 'vs/workbench/common/views';
 import { ITerminalStatusList } from 'vs/workbench/contrib/terminal/browser/terminalStatusList';
 import { ScrollPosition } from 'vs/workbench/contrib/terminal/browser/xterm/markNavigationAddon';
 import { ITerminalQuickFixAddon } from 'vs/workbench/contrib/terminal/browser/xterm/quickFixAddon';
+import { XtermTerminal } from 'vs/workbench/contrib/terminal/browser/xterm/xtermTerminal';
 import { IRegisterContributedProfileArgs, IRemoteTerminalAttachTarget, IStartExtensionTerminalRequest, ITerminalBackend, ITerminalConfigHelper, ITerminalFont, ITerminalProcessExtHostProxy } from 'vs/workbench/contrib/terminal/common/terminal';
 import { EditorGroupColumn } from 'vs/workbench/services/editor/common/editorGroupColumn';
 import { ISimpleSelectedSuggestion } from 'vs/workbench/services/suggest/browser/simpleSuggestWidget';
@@ -587,7 +589,7 @@ export interface ITerminalInstance {
 	/**
 	 * The xterm.js instance for this terminal.
 	 */
-	readonly xterm?: IXtermTerminal;
+	readonly xterm?: XtermTerminal;
 
 	/**
 	 * Returns an array of data events that have fired within the first 10 seconds. If this is
@@ -599,6 +601,9 @@ export interface ITerminalInstance {
 
 	/** A promise that resolves when the terminal's pty/process have been created. */
 	readonly processReady: Promise<void>;
+
+	/** A barrier that opens when the terminal's container is ready */
+	readonly containerReadyBarrier: AutoOpenBarrier;
 
 	/** Whether the terminal's process has child processes (ie. is dirty/busy). */
 	readonly hasChildProcesses: boolean;
@@ -1039,11 +1044,6 @@ export interface IXtermTerminal {
 	 * Returns a reverse iterator of buffer lines as strings
 	 */
 	getBufferReverseIterator(): IterableIterator<string>;
-
-	/**
-	 * Focuses the accessible buffer, updating its contents
-	 */
-	focusAccessibleBuffer(): Promise<void>;
 
 	/**
 	 * Refreshes the terminal after it has been moved.
