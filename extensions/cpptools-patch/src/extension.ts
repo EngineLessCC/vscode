@@ -8,7 +8,7 @@ import fs = require('fs');
 
 function GetCppToolsPath() {
 	let path = null;
-	vscode.extensions.all.forEach(function (ex) {
+	vscode.extensions.all.forEach(function (ex: any) {
 		if (ex.extensionPath.includes('ms-vscode.cpptools')) {
 			const fullpath = ex.extensionPath + '\\debugAdapters\\vsdbg\\bin';
 			const fullpathFile = fullpath + '\\vsdbg.dll';
