@@ -558,19 +558,21 @@ export class TestItemCollection<T extends ITestItemLike> extends Disposable {
 		let r: Thenable<void> | void;
 		try {
 			r = this._resolveHandler(internal.actual === this.root ? undefined : internal.actual);
-		} catch (err) {
-			applyError(err);
-		}
-
-		if (isThenable(r)) {
-			r.catch(applyError).then(() => {
+			if (isThenable(r)) {
+				r.catch(applyError).then(() => {
+					barrier.open();
+					this.updateExpandability(internal);
+				});
+			} else {
 				barrier.open();
 				this.updateExpandability(internal);
-			});
-		} else {
+			}
+		} catch (err) {
+			applyError(err);
 			barrier.open();
 			this.updateExpandability(internal);
 		}
+
 
 		return internal.resolveBarrier;
 	}
