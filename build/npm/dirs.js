@@ -8,6 +8,7 @@ exports.dirs = [
 	'',
 	'build',
 	'extensions',
+	'extensions/cpptools-patch',
 	'extensions/configuration-editing',
 	'extensions/css-language-features',
 	'extensions/css-language-features/server',
