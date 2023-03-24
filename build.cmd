@@ -1,2 +1,2 @@
-set NODE_OPTIONS=--openssl-legacy-provider
-yarn run gulp vscode-win32-x64
+yarn --force --ignore-engines
+yarn run gulp vscode-win32-x64 --openssl-legacy-provider
